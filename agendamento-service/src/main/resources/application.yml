@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: agendamento-service
+  datasource:
+    url: jdbc:h2:mem:consultadb
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+  graphql:
+    graphiql:
+      enabled: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+server:
+  port: 8080

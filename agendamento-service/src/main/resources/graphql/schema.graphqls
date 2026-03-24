@@ -1,0 +1,12 @@
+type Consulta {
+    id: ID!
+    pacienteUsername: String!
+    medicoUsername: String!
+    enfermeiroUsername: String
+    dataHora: String!
+    observacoes: String
+}
+
+type Query {
+    historicoPaciente(pacienteUsername: String!, somenteFuturas: Boolean): [Consulta!]!
+}
