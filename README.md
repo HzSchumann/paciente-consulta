@@ -1,4 +1,4 @@
-# Tech Challenge Fase 3 - Sistema de Pacientes e Consultas.
+# Tech Challenge Fase 3 - Sistema de Pacientes e Consultas
 
 Projeto backend multi-modulo em Spring Boot com separacao entre identidade, comando, leitura projetada, notificacao assincrona e BFF GraphQL.
 
@@ -72,13 +72,21 @@ Observacoes:
 
 ## Como Rodar
 
-### 1. Configure o bootstrap admin
+### 1. Configure as variaveis de ambiente
 
 ```bash
 export APP_BOOTSTRAP_ADMIN_USERNAME=admin
 export APP_BOOTSTRAP_ADMIN_PASSWORD=admin123
 export APP_BOOTSTRAP_ADMIN_ROLES=ADMIN
 export APP_INTERNAL_AUTH_SECRET=change-me-now
+export APP_JWT_JWK_SET_URI=http://127.0.0.1:8084/.well-known/jwks.json
+export APP_JWT_TOKEN_STATUS_URI=http://127.0.0.1:8084/internal/tokens/revoked
+export APP_AUTH_DATASOURCE_URL=jdbc:postgresql://127.0.0.1:5432/agendamento
+export APP_AUTH_DATASOURCE_USERNAME=paciente_consulta
+export APP_AUTH_DATASOURCE_PASSWORD=paciente_consulta
+export APP_AGENDAMENTO_DATASOURCE_URL=jdbc:postgresql://127.0.0.1:5432/agendamento
+export APP_AGENDAMENTO_DATASOURCE_USERNAME=paciente_consulta
+export APP_AGENDAMENTO_DATASOURCE_PASSWORD=paciente_consulta
 ```
 
 ### 2. Suba a infraestrutura
@@ -87,7 +95,18 @@ export APP_INTERNAL_AUTH_SECRET=change-me-now
 docker compose up -d postgres rabbitmq
 ```
 
-### 3. Suba os servicos
+### 3. Instale os artefatos Maven locais
+
+Isso evita falhas de resolucao do `consulta-contract` e do `pom` pai quando os servicos sao iniciados individualmente.
+
+```bash
+mvn -N install
+mvn -pl consulta-contract install -DskipTests
+```
+
+### 4. Suba os servicos nas portas padrao
+
+Rode cada comando em um terminal separado, a partir da raiz do projeto:
 
 ```bash
 mvn -pl auth-service spring-boot:run
@@ -105,6 +124,44 @@ Portas:
 - `gateway-service`: `http://localhost:8083`
 - RabbitMQ Management: `http://localhost:15672`
 - PostgreSQL: `localhost:5432`
+
+### 5. Se as portas `8080` ou `8083` ja estiverem ocupadas
+
+No ambiente validado, havia instancias antigas rodando nessas portas. Quando isso acontecer, suba uma instancia limpa em portas alternativas:
+
+```bash
+mvn -pl agendamento-service spring-boot:run -Dspring-boot.run.arguments=--server.port=18080
+mvn -pl gateway-service spring-boot:run -Dspring-boot.run.arguments=--server.port=18083
+```
+
+Se usar as portas alternativas, ajuste o gateway para apontar para a instancia limpa do agendamento:
+
+```bash
+export AGENDAMENTO_BASE_URL=http://127.0.0.1:18080
+export HISTORICO_BASE_URL=http://127.0.0.1:8082
+```
+
+### 6. Ordem recomendada de subida
+
+1. `auth-service`
+2. `agendamento-service`
+3. `historico-service`
+4. `notificacao-service`
+5. `gateway-service`
+
+### 7. Fluxo validado
+
+O fluxo abaixo foi executado com sucesso no terminal:
+
+1. gerar token no `auth-service`
+2. provisionar `medico1` e `paciente1`
+3. criar consulta via GraphQL no `gateway-service`
+4. consultar historico do paciente via GraphQL
+
+Observacao importante:
+
+- a criacao da consulta e sincrona
+- a aparicao no historico depende da propagacao assincrona via RabbitMQ e pode levar alguns segundos
 
 Datasources default:
 
@@ -271,7 +328,7 @@ Os schemas usam o scalar customizado `DateTime` com formato ISO-8601 local:
 Executar testes de modulo:
 
 ```bash
-mvn -q -pl auth-service,agendamento-service,historico-service,gateway-service -am test
+mvn -q -pl auth-service,agendamento-service,historico-service,gateway-service,notificacao-service -am test
 ```
 
 Executar E2E:

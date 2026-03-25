@@ -3,7 +3,6 @@ package br.com.techchallenge.auth.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 import java.time.Instant;
@@ -15,12 +14,10 @@ public class SigningKey {
     @Id
     private String keyId;
 
-    @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String publicKey;
 
-    @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String privateKey;
 
     @Column(nullable = false)
