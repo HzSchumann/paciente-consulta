@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: historico-service
+  datasource:
+    url: jdbc:h2:mem:historicodb
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  graphql:
+    schema:
+      locations: classpath:graphql/historico/
+    graphiql:
+      enabled: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        default-requeue-rejected: false
+
+server:
+  port: 8082
+
+app:
+  security:
+    jwt:
+      issuer: techchallenge-paciente-consulta
+      public-key: ${APP_JWT_PUBLIC_KEY:}
+      jwk-set-uri: ${APP_JWT_JWK_SET_URI:}
+      token-status-uri: ${APP_JWT_TOKEN_STATUS_URI:}
+      internal-secret: ${APP_INTERNAL_AUTH_SECRET:change-me}
+      ttl: PT1H

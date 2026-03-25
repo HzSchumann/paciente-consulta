@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: ${APP_AUTH_DATASOURCE_URL:jdbc:postgresql://localhost:5432/agendamento}
+    username: ${APP_AUTH_DATASOURCE_USERNAME:paciente_consulta}
+    password: ${APP_AUTH_DATASOURCE_PASSWORD:paciente_consulta}
+  sql:
+    init:
+      mode: never
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+server:
+  port: 8084
+
+app:
+  security:
+    internal-secret: ${APP_INTERNAL_AUTH_SECRET:change-me}
+    jwt:
+      issuer: techchallenge-paciente-consulta
+      key-id: ${APP_JWT_KEY_ID:auth-key}
+      public-key: ${APP_JWT_PUBLIC_KEY:}
+      private-key: ${APP_JWT_PRIVATE_KEY:}
+      ttl: PT15M
+      refresh-ttl: P7D
+    bootstrap-admin:
+      username: ${APP_BOOTSTRAP_ADMIN_USERNAME:}
+      password: ${APP_BOOTSTRAP_ADMIN_PASSWORD:}
+      roles: ${APP_BOOTSTRAP_ADMIN_ROLES:ADMIN}

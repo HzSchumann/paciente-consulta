@@ -1,22 +1,21 @@
 package br.com.techchallenge.agendamento.controller;
 
 import br.com.techchallenge.agendamento.dto.AtualizarConsultaRequest;
+import br.com.techchallenge.agendamento.dto.ConsultaResponse;
 import br.com.techchallenge.agendamento.dto.CriarConsultaRequest;
-import br.com.techchallenge.agendamento.entity.Consulta;
 import br.com.techchallenge.agendamento.service.ConsultaService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/consultas")
@@ -30,20 +29,21 @@ public class ConsultaController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMEIRO')")
-    public Consulta criar(@Valid @RequestBody CriarConsultaRequest request) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ConsultaResponse criar(@Valid @RequestBody CriarConsultaRequest request) {
         return consultaService.criar(request);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMEIRO')")
-    public Consulta atualizar(@PathVariable Long id, @Valid @RequestBody AtualizarConsultaRequest request) {
+    public ConsultaResponse atualizar(@PathVariable Long id, @Valid @RequestBody AtualizarConsultaRequest request) {
         return consultaService.atualizar(id, request);
     }
 
-    @GetMapping("/minhas")
-    @PreAuthorize("hasRole('PACIENTE')")
-    public List<Consulta> minhasConsultas(Authentication authentication,
-                                         @RequestParam(defaultValue = "false") boolean somenteFuturas) {
-        return consultaService.consultarHistoricoPaciente(authentication.getName(), somenteFuturas);
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMEIRO')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancelar(@PathVariable Long id, Authentication authentication) {
+        consultaService.cancelar(id, authentication.getName());
     }
 }

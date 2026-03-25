@@ -1,0 +1,36 @@
+scalar DateTime
+
+type ConsultaPayload {
+    id: ID!
+    pacienteUsername: String!
+    medicoUsername: String!
+    enfermeiroUsername: String
+    dataHora: DateTime!
+    observacoes: String
+    status: String!
+}
+
+type Query {
+    serviceInfo: String!
+}
+
+input CriarConsultaInput {
+    pacienteUsername: String!
+    medicoUsername: String!
+    enfermeiroUsername: String
+    dataHora: DateTime!
+    observacoes: String
+}
+
+input AtualizarConsultaInput {
+    dataHora: DateTime
+    observacoes: String
+    medicoUsername: String
+    enfermeiroUsername: String
+}
+
+type Mutation {
+    criarConsulta(input: CriarConsultaInput!): ConsultaPayload!
+    atualizarConsulta(id: ID!, input: AtualizarConsultaInput!): ConsultaPayload!
+    cancelarConsulta(id: ID!): Boolean!
+}

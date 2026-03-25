@@ -9,13 +9,19 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>consulta-contract</module>
+        <module>auth-service</module>
         <module>agendamento-service</module>
+        <module>historico-service</module>
         <module>notificacao-service</module>
+        <module>gateway-service</module>
+        <module>system-tests</module>
     </modules>
 
     <properties>
         <java.version>21</java.version>
         <spring-boot.version>3.3.5</spring-boot.version>
+        <graphql-java-extended-scalars.version>22.0</graphql-java-extended-scalars.version>
     </properties>
 
     <dependencyManagement>
@@ -26,6 +32,11 @@
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.graphql-java</groupId>
+                <artifactId>graphql-java-extended-scalars</artifactId>
+                <version>${graphql-java-extended-scalars.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -40,7 +51,13 @@
                     <configuration>
                         <source>${java.version}</source>
                         <target>${java.version}</target>
+                        <parameters>true</parameters>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -1,6 +1,8 @@
 package br.com.techchallenge.agendamento.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,6 +22,9 @@ public class Consulta {
     private String enfermeiroUsername;
     private LocalDateTime dataHora;
     private String observacoes;
+
+    @Enumerated(EnumType.STRING)
+    private ConsultaStatus status;
 
     public Long getId() {
         return id;
@@ -67,5 +72,13 @@ public class Consulta {
 
     public void setObservacoes(String observacoes) {
         this.observacoes = observacoes;
+    }
+
+    public ConsultaStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ConsultaStatus status) {
+        this.status = status;
     }
 }

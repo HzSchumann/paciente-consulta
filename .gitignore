@@ -1,0 +1,8 @@
+.DS_Store
+.idea/
+.vscode/
+target/
+*/target/
+**/target/
+*.log
+.mvn/timing.properties

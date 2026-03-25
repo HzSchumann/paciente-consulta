@@ -1,20 +1,34 @@
 package br.com.techchallenge.notificacao.service;
 
-import br.com.techchallenge.notificacao.config.RabbitConfig;
-import br.com.techchallenge.notificacao.messaging.ConsultaEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import br.com.techchallenge.contract.messaging.ConsultaEvent;
+import br.com.techchallenge.contract.messaging.ConsultaMessagingTopology;
+import br.com.techchallenge.notificacao.entity.ProcessedEvent;
+import br.com.techchallenge.notificacao.repository.ProcessedEventRepository;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class NotificacaoListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NotificacaoListener.class);
+    private final NotificationSender notificationSender;
+    private final ProcessedEventRepository processedEventRepository;
 
-    @RabbitListener(queues = RabbitConfig.QUEUE_NOTIFICACAO)
+    public NotificacaoListener(
+            NotificationSender notificationSender,
+            ProcessedEventRepository processedEventRepository
+    ) {
+        this.notificationSender = notificationSender;
+        this.processedEventRepository = processedEventRepository;
+    }
+
+    @Transactional
+    @RabbitListener(queues = ConsultaMessagingTopology.QUEUE_NOTIFICACAO, containerFactory = "rabbitListenerContainerFactory")
     public void consumirEvento(ConsultaEvent event) {
-        LOGGER.info("Lembrete enviado para paciente={} da consultaId={} em {} (acao={})",
-                event.pacienteUsername(), event.consultaId(), event.dataHora(), event.acao());
+        if (processedEventRepository.existsById(event.eventId())) {
+            return;
+        }
+        notificationSender.enviar(event);
+        processedEventRepository.save(new ProcessedEvent(event.eventId()));
     }
 }

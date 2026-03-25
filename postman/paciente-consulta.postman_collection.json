@@ -3,110 +3,477 @@
     "name": "Paciente Consulta - Tech Challenge Fase 3",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    {
+      "key": "baseUrlAuth",
+      "value": "http://localhost:8084"
+    },
+    {
+      "key": "baseUrlAgendamento",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "baseUrlGateway",
+      "value": "http://localhost:8083"
+    },
+    {
+      "key": "adminAccessToken",
+      "value": ""
+    },
+    {
+      "key": "adminRefreshToken",
+      "value": ""
+    },
+    {
+      "key": "medicoAccessToken",
+      "value": ""
+    },
+    {
+      "key": "medicoRefreshToken",
+      "value": ""
+    },
+    {
+      "key": "pacienteAccessToken",
+      "value": ""
+    },
+    {
+      "key": "consultaId",
+      "value": "1"
+    }
+  ],
   "item": [
     {
-      "name": "Criar consulta (médico)",
+      "name": "Auth - Token admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('adminAccessToken', json.accessToken);",
+              "pm.collectionVariables.set('adminRefreshToken', json.refreshToken);"
+            ]
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
           {
-            "key": "Authorization",
-            "value": "Basic bWVkaWNvMToxMjM0NTY="
-          },
-          {
             "key": "Content-Type",
             "value": "application/json"
           }
         ],
-        "url": {
-          "raw": "http://localhost:8080/consultas",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["consultas"]
-        },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"pacienteUsername\": \"paciente1\",\n  \"medicoUsername\": \"medico1\",\n  \"enfermeiroUsername\": \"enfermeiro1\",\n  \"dataHora\": \"2030-01-10T14:00:00\",\n  \"observacoes\": \"Retorno\"\n}"
-        }
-      }
-    },
-    {
-      "name": "Atualizar consulta (enfermeiro)",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Basic ZW5mZXJtZWlybzE6MTIzNDU2"
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "http://localhost:8080/consultas/1",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["consultas", "1"]
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
         },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"observacoes\": \"Consulta remarcada\",\n  \"dataHora\": \"2030-01-10T15:00:00\"\n}"
-        }
-      }
-    },
-    {
-      "name": "Minhas consultas (paciente)",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Basic cGFjaWVudGUxOjEyMzQ1Ng=="
-          }
-        ],
         "url": {
-          "raw": "http://localhost:8080/consultas/minhas?somenteFuturas=true",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["consultas", "minhas"],
-          "query": [
-            {
-              "key": "somenteFuturas",
-              "value": "true"
-            }
+          "raw": "{{baseUrlAuth}}/auth/token",
+          "host": [
+            "{{baseUrlAuth}}"
+          ],
+          "path": [
+            "auth",
+            "token"
           ]
         }
       }
     },
     {
-      "name": "GraphQL histórico (paciente)",
+      "name": "Auth - Refresh admin",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{adminRefreshToken}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrlAuth}}/auth/refresh",
+          "host": [
+            "{{baseUrlAuth}}"
+          ],
+          "path": [
+            "auth",
+            "refresh"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin - Provisionar medico",
       "request": {
         "method": "POST",
         "header": [
           {
             "key": "Authorization",
-            "value": "Basic cGFjaWVudGUxOjEyMzQ1Ng=="
+            "value": "Bearer {{adminAccessToken}}"
           },
           {
             "key": "Content-Type",
             "value": "application/json"
           }
         ],
-        "url": {
-          "raw": "http://localhost:8080/graphql",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "8080",
-          "path": ["graphql"]
-        },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"query\": \"query { historicoPaciente(pacienteUsername: \\\"paciente2\\\", somenteFuturas: true) { id pacienteUsername medicoUsername dataHora observacoes } }\"\n}"
+          "raw": "{\n  \"username\": \"medico1\",\n  \"password\": \"123456\",\n  \"roles\": \"MEDICO\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrlAuth}}/admin/users",
+          "host": [
+            "{{baseUrlAuth}}"
+          ],
+          "path": [
+            "admin",
+            "users"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin - Provisionar paciente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminAccessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"paciente1\",\n  \"password\": \"123456\",\n  \"roles\": \"PACIENTE\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrlAuth}}/admin/users",
+          "host": [
+            "{{baseUrlAuth}}"
+          ],
+          "path": [
+            "admin",
+            "users"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Admin - Rotacionar chave",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminAccessToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrlAuth}}/admin/keys/rotate",
+          "host": [
+            "{{baseUrlAuth}}"
+          ],
+          "path": [
+            "admin",
+            "keys",
+            "rotate"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Auth - Token medico",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('medicoAccessToken', json.accessToken);",
+              "pm.collectionVariables.set('medicoRefreshToken', json.refreshToken);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"medico1\",\n  \"password\": \"123456\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrlAuth}}/auth/token",
+          "host": [
+            "{{baseUrlAuth}}"
+          ],
+          "path": [
+            "auth",
+            "token"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Auth - Token paciente",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('pacienteAccessToken', json.accessToken);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"paciente1\",\n  \"password\": \"123456\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrlAuth}}/auth/token",
+          "host": [
+            "{{baseUrlAuth}}"
+          ],
+          "path": [
+            "auth",
+            "token"
+          ]
+        }
+      }
+    },
+    {
+      "name": "REST - Criar consulta",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('consultaId', json.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{medicoAccessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pacienteUsername\": \"paciente1\",\n  \"medicoUsername\": \"medico1\",\n  \"enfermeiroUsername\": \"enfermeiro1\",\n  \"dataHora\": \"2030-01-10T14:00:00\",\n  \"observacoes\": \"Retorno anual\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrlAgendamento}}/consultas",
+          "host": [
+            "{{baseUrlAgendamento}}"
+          ],
+          "path": [
+            "consultas"
+          ]
+        }
+      }
+    },
+    {
+      "name": "REST - Atualizar consulta",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{medicoAccessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"observacoes\": \"Consulta remarcada\",\n  \"dataHora\": \"2030-01-10T15:00:00\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrlAgendamento}}/consultas/{{consultaId}}",
+          "host": [
+            "{{baseUrlAgendamento}}"
+          ],
+          "path": [
+            "consultas",
+            "{{consultaId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "REST - Cancelar consulta",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{medicoAccessToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrlAgendamento}}/consultas/{{consultaId}}",
+          "host": [
+            "{{baseUrlAgendamento}}"
+          ],
+          "path": [
+            "consultas",
+            "{{consultaId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Gateway GraphQL - Criar consulta",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{medicoAccessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"mutation { criarConsulta(input: { pacienteUsername: \\\"paciente1\\\", medicoUsername: \\\"medico1\\\", enfermeiroUsername: \\\"enfermeiro1\\\", dataHora: \\\"2030-01-11T10:00:00\\\", observacoes: \\\"Criada via gateway\\\" }) { id status dataHora } }\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrlGateway}}/graphql",
+          "host": [
+            "{{baseUrlGateway}}"
+          ],
+          "path": [
+            "graphql"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Gateway GraphQL - Historico do paciente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{pacienteAccessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"query { historicoPaciente(pacienteUsername: \\\"paciente1\\\", somenteFuturas: false) { id pacienteUsername medicoUsername status dataHora ultimaAtualizacaoEm } }\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrlGateway}}/graphql",
+          "host": [
+            "{{baseUrlGateway}}"
+          ],
+          "path": [
+            "graphql"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Gateway GraphQL - Cancelar consulta",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{medicoAccessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"mutation { cancelarConsulta(id: {{consultaId}}) }\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrlGateway}}/graphql",
+          "host": [
+            "{{baseUrlGateway}}"
+          ],
+          "path": [
+            "graphql"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Auth - Revogar sessao medico",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{medicoAccessToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{medicoRefreshToken}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrlAuth}}/auth/revoke",
+          "host": [
+            "{{baseUrlAuth}}"
+          ],
+          "path": [
+            "auth",
+            "revoke"
+          ]
         }
       }
     }
