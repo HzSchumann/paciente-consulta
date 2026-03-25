@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: gateway-service
+  graphql:
+    schema:
+      locations: classpath:graphql/gateway/
+    graphiql:
+      enabled: true
+
+server:
+  port: 8083
+
+app:
+  security:
+    jwt:
+      issuer: techchallenge-paciente-consulta
+      public-key: ${APP_JWT_PUBLIC_KEY:}
+      jwk-set-uri: ${APP_JWT_JWK_SET_URI:}
+      token-status-uri: ${APP_JWT_TOKEN_STATUS_URI:}
+      internal-secret: ${APP_INTERNAL_AUTH_SECRET:change-me}
+      ttl: PT1H
+
+downstream:
+  agendamento-base-url: ${AGENDAMENTO_BASE_URL:http://localhost:8080}
+  historico-base-url: ${HISTORICO_BASE_URL:http://localhost:8082}

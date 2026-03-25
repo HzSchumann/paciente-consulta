@@ -1,0 +1,14 @@
+app:
+  security:
+    jwt:
+      issuer: techchallenge-paciente-consulta
+      public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7PLoBVezI1B2NG0mA4XDwisO8GXF+DbnidyIyHq9yQ9c6i4gceZxfNWAb3XS3pXWKQmsy6JVRQjnsIp0HuM86q5XUCAiJOi9fyhoZKvlRtvEA4pon9RlyhjvUX10a9toQgqsVVqqgfyeFnLtXgpH8fUNI0uhtm7/hsIOe5By46CQ7kVwrXa8A1oQqSi6TIUhrTQr1IOoTSmFnfUIFFxEr5mMVboNyjesJYZ71iWYpZo5iQTcJXGvLi1AEPHHfhg1qP9wmAtlkcLljRxbSbIA/z3NiVsN11XvuTNKnuuRUgu+DYmpThieM/HswhA+rkgjqZAjAO56VXqbIpQjtsWGZQIDAQAB
+spring:
+  datasource:
+    url: jdbc:h2:mem:historicotest;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false

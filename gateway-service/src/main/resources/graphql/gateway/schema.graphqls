@@ -1,0 +1,37 @@
+scalar DateTime
+
+type Consulta {
+    id: ID!
+    pacienteUsername: String!
+    medicoUsername: String!
+    enfermeiroUsername: String
+    dataHora: DateTime!
+    observacoes: String
+    status: String!
+    ultimaAtualizacaoEm: DateTime
+}
+
+type Query {
+    historicoPaciente(pacienteUsername: String!, somenteFuturas: Boolean): [Consulta!]!
+}
+
+input CriarConsultaInput {
+    pacienteUsername: String!
+    medicoUsername: String!
+    enfermeiroUsername: String
+    dataHora: DateTime!
+    observacoes: String
+}
+
+input AtualizarConsultaInput {
+    dataHora: DateTime
+    observacoes: String
+    medicoUsername: String
+    enfermeiroUsername: String
+}
+
+type Mutation {
+    criarConsulta(input: CriarConsultaInput!): Consulta!
+    atualizarConsulta(id: ID!, input: AtualizarConsultaInput!): Consulta!
+    cancelarConsulta(id: ID!): Boolean!
+}

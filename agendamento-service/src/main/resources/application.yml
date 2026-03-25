@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: agendamento-service
+  datasource:
+    url: ${APP_AGENDAMENTO_DATASOURCE_URL:jdbc:postgresql://localhost:5432/agendamento}
+    username: ${APP_AGENDAMENTO_DATASOURCE_USERNAME:paciente_consulta}
+    password: ${APP_AGENDAMENTO_DATASOURCE_PASSWORD:paciente_consulta}
+  sql:
+    init:
+      mode: never
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  graphql:
+    schema:
+      locations: classpath:graphql/agendamento/
+    graphiql:
+      enabled: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        default-requeue-rejected: false
+
+server:
+  port: 8080
+
+app:
+  security:
+    jwt:
+      issuer: techchallenge-paciente-consulta
+      public-key: ${APP_JWT_PUBLIC_KEY:}
+      jwk-set-uri: ${APP_JWT_JWK_SET_URI:}
+      token-status-uri: ${APP_JWT_TOKEN_STATUS_URI:}
+      internal-secret: ${APP_INTERNAL_AUTH_SECRET:change-me}
+      ttl: PT1H
+  outbox:
+    publisher:
+      enabled: true
+      fixed-delay: 1000
+      batch-size: 20
+      retry-backoff: PT5S
+      lock-timeout: PT30S
