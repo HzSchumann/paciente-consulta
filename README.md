@@ -1,4 +1,4 @@
-# Tech Challenge Fase 3 - Sistema de Pacientes e Consultas
+# Tech Challenge Fase 3 - Sistema de Pacientes e Consultas.
 
 Projeto backend multi-modulo em Spring Boot com separacao entre identidade, comando, leitura projetada, notificacao assincrona e BFF GraphQL.
 
